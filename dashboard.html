@@ -1,0 +1,982 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firefox History Journal Dashboard</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #2196F3;
+            margin: 10px 0;
+        }
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+        .section {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #2196F3;
+            padding-bottom: 10px;
+        }
+        .entry-item {
+            padding: 10px;
+            border-left: 4px solid #2196F3;
+            margin: 10px 0;
+            background-color: #f8f9fa;
+        }
+        .entry-date {
+            font-weight: bold;
+            color: #333;
+        }
+        .entry-stats {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .productivity-high { border-left-color: #4CAF50; }
+        .productivity-medium { border-left-color: #FF9800; }
+        .productivity-low { border-left-color: #F44336; }
+        .commands {
+            background-color: #263238;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        .commands code {
+            background-color: #37474F;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .refresh-note {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            margin-top: 20px;
+        }
+        .entry-date {
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .entry-date:hover {
+            color: #2196F3;
+            text-decoration: underline;
+        }
+        .entry-details {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+            animation: slideDown 0.3s ease;
+        }
+        .entry-details.show {
+            display: block;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; max-height: 0; }
+            to { opacity: 1; max-height: 1000px; }
+        }
+        .sites-grid {
+            display: grid;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .site-entry {
+            padding: 8px;
+            background-color: #f8f9fa;
+            border-left: 3px solid;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .site-domain {
+            font-weight: bold;
+            color: #333;
+        }
+        .site-stats {
+            color: #666;
+            font-size: 0.85em;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+        .detail-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .detail-stat {
+            text-align: center;
+            padding: 10px;
+            background-color: #e3f2fd;
+            border-radius: 5px;
+        }
+        .detail-stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #1976d2;
+        }
+        .detail-stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Firefox History Journal Dashboard</h1>
+            <p>Last 7 days overview • Generated 2025-08-30 21:53:46</p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">41</div>
+                <div class="stat-label">Sites Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">9h 46m</div>
+                <div class="stat-label">Time Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">5.5/10</div>
+                <div class="stat-label">Productivity Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Active Days</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Weekly Summary</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">468</div>
+                    <div class="stat-label">Total Sites Visited</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">106h 3m</div>
+                    <div class="stat-label">Total Browsing Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">5.6/10</div>
+                    <div class="stat-label">Average Productivity</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>Recent Journal Entries</h2>
+
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250830')">Saturday, August 30, 2025</div>
+                <div class="entry-stats">
+                    41 sites • 
+                    9h 46m • 
+                    Productivity: 5.5/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250830">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">41</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">9h 46m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">5.5/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">7</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">418 minutes • 447 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">Development</div>
+                        <div class="site-stats">71 minutes • 67 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">Communication</div>
+                        <div class="site-stats">60 minutes • 9 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">Entertainment</div>
+                        <div class="site-stats">27 minutes • 35 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #DDA0DD;">
+                        <div class="site-domain">Reading</div>
+                        <div class="site-stats">5 minutes • 26 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">localhost:8000</div>
+                        <div class="site-stats">115 min • 207 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">127.0.0.1:8000</div>
+                        <div class="site-stats">112 min • 114 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">perplexity.ai</div>
+                        <div class="site-stats">91 min • 37 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">github.com</div>
+                        <div class="site-stats">65 min • 60 visits • Development</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">mail.proton.me</div>
+                        <div class="site-stats">60 min • 9 visits • Communication</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">127.0.0.1:5001</div>
+                        <div class="site-stats">25 min • 9 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">youtube.com</div>
+                        <div class="site-stats">25 min • 29 visits • Entertainment</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">192.168.1.1</div>
+                        <div class="site-stats">16 min • 17 visits • Uncategorized</div>
+                    </div></div></div></div>
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250829')">Friday, August 29, 2025</div>
+                <div class="entry-stats">
+                    48 sites • 
+                    12h 16m • 
+                    Productivity: 5.8/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250829">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">48</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">12h 16m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">5.8/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">6</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">474 minutes • 306 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">Professional</div>
+                        <div class="site-stats">146 minutes • 74 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">Development</div>
+                        <div class="site-stats">53 minutes • 32 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">Communication</div>
+                        <div class="site-stats">41 minutes • 11 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Search</div>
+                        <div class="site-stats">14 minutes • 21 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">localhost:8000</div>
+                        <div class="site-stats">220 min • 144 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">linkedin.com</div>
+                        <div class="site-stats">146 min • 74 visits • Professional</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">127.0.0.1:5001</div>
+                        <div class="site-stats">57 min • 24 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">github.com</div>
+                        <div class="site-stats">53 min • 32 visits • Development</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">wpsz.ssd.sk</div>
+                        <div class="site-stats">40 min • 9 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">mail.proton.me</div>
+                        <div class="site-stats">39 min • 10 visits • Communication</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">blockchain.com</div>
+                        <div class="site-stats">29 min • 6 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">google.com</div>
+                        <div class="site-stats">14 min • 21 visits • Search</div>
+                    </div></div></div></div>
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250828')">Thursday, August 28, 2025</div>
+                <div class="entry-stats">
+                    57 sites • 
+                    11h 52m • 
+                    Productivity: 5.6/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250828">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">57</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">11h 52m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">5.6/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">8</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">220 minutes • 228 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">Professional</div>
+                        <div class="site-stats">169 minutes • 65 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">Entertainment</div>
+                        <div class="site-stats">147 minutes • 69 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Search</div>
+                        <div class="site-stats">62 minutes • 16 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">Communication</div>
+                        <div class="site-stats">57 minutes • 27 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">linkedin.com</div>
+                        <div class="site-stats">169 min • 65 visits • Professional</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">youtube.com</div>
+                        <div class="site-stats">147 min • 69 visits • Entertainment</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">google.com</div>
+                        <div class="site-stats">62 min • 16 visits • Search</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">mail.google.com</div>
+                        <div class="site-stats">31 min • 15 visits • Communication</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">xda-developers.com</div>
+                        <div class="site-stats">28 min • 9 visits • Development</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">imageglass.org</div>
+                        <div class="site-stats">26 min • 4 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">apps.microsoft.com</div>
+                        <div class="site-stats">22 min • 9 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">perplexity.ai</div>
+                        <div class="site-stats">21 min • 13 visits • Uncategorized</div>
+                    </div></div></div></div>
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250827')">Wednesday, August 27, 2025</div>
+                <div class="entry-stats">
+                    59 sites • 
+                    14h 38m • 
+                    Productivity: 6.0/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250827">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">59</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">14h 38m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">6.0/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">7</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">289 minutes • 281 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">Professional</div>
+                        <div class="site-stats">267 minutes • 73 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Search</div>
+                        <div class="site-stats">104 minutes • 125 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">Development</div>
+                        <div class="site-stats">79 minutes • 10 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">Entertainment</div>
+                        <div class="site-stats">75 minutes • 36 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">linkedin.com</div>
+                        <div class="site-stats">267 min • 73 visits • Professional</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">google.com</div>
+                        <div class="site-stats">104 min • 125 visits • Search</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">youtube.com</div>
+                        <div class="site-stats">73 min • 33 visits • Entertainment</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">github.com</div>
+                        <div class="site-stats">63 min • 6 visits • Development</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">mail.google.com</div>
+                        <div class="site-stats">57 min • 15 visits • Communication</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">podnikatelvpluse.sk</div>
+                        <div class="site-stats">35 min • 8 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">secure.vsds.sk</div>
+                        <div class="site-stats">32 min • 17 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">share.streamlit.io</div>
+                        <div class="site-stats">30 min • 2 visits • Uncategorized</div>
+                    </div></div></div></div>
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250826')">Tuesday, August 26, 2025</div>
+                <div class="entry-stats">
+                    61 sites • 
+                    15h 13m • 
+                    Productivity: 5.6/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250826">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">61</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">15h 13m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">5.6/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">8</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">627 minutes • 689 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">Professional</div>
+                        <div class="site-stats">241 minutes • 117 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">Development</div>
+                        <div class="site-stats">17 minutes • 23 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Search</div>
+                        <div class="site-stats">12 minutes • 7 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">Communication</div>
+                        <div class="site-stats">8 minutes • 3 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">127.0.0.1:8000</div>
+                        <div class="site-stats">411 min • 381 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">linkedin.com</div>
+                        <div class="site-stats">241 min • 117 visits • Professional</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">memodo.cz</div>
+                        <div class="site-stats">39 min • 34 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">github.com</div>
+                        <div class="site-stats">15 min • 21 visits • Development</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">feedly.com</div>
+                        <div class="site-stats">14 min • 34 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">google.com</div>
+                        <div class="site-stats">12 min • 7 visits • Search</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">app.energomonitor.cz</div>
+                        <div class="site-stats">11 min • 53 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">lnkd.in</div>
+                        <div class="site-stats">10 min • 3 visits • Uncategorized</div>
+                    </div></div></div></div>
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250825')">Monday, August 25, 2025</div>
+                <div class="entry-stats">
+                    85 sites • 
+                    16h 5m • 
+                    Productivity: 5.4/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250825">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">85</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">16h 5m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">5.4/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">10</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">459 minutes • 383 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">Entertainment</div>
+                        <div class="site-stats">141 minutes • 55 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Search</div>
+                        <div class="site-stats">119 minutes • 68 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">Professional</div>
+                        <div class="site-stats">104 minutes • 64 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #DDA0DD;">
+                        <div class="site-domain">Reading</div>
+                        <div class="site-stats">56 minutes • 102 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">youtube.com</div>
+                        <div class="site-stats">141 min • 55 visits • Entertainment</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">google.com</div>
+                        <div class="site-stats">119 min • 68 visits • Search</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">linkedin.com</div>
+                        <div class="site-stats">104 min • 64 visits • Professional</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">perplexity.ai</div>
+                        <div class="site-stats">75 min • 39 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #DDA0DD;">
+                        <div class="site-domain">medium.com</div>
+                        <div class="site-stats">56 min • 102 visits • Reading</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">127.0.0.1:5000</div>
+                        <div class="site-stats">54 min • 28 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">mail.google.com</div>
+                        <div class="site-stats">37 min • 14 visits • Communication</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain"></div>
+                        <div class="site-stats">34 min • 6 visits • Uncategorized</div>
+                    </div></div></div></div>
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250824')">Sunday, August 24, 2025</div>
+                <div class="entry-stats">
+                    49 sites • 
+                    11h 28m • 
+                    Productivity: 5.8/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250824">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">49</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">11h 28m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">5.8/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">7</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">Professional</div>
+                        <div class="site-stats">306 minutes • 101 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">242 minutes • 232 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">Entertainment</div>
+                        <div class="site-stats">87 minutes • 53 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">Development</div>
+                        <div class="site-stats">19 minutes • 8 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Search</div>
+                        <div class="site-stats">16 minutes • 15 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">linkedin.com</div>
+                        <div class="site-stats">306 min • 101 visits • Professional</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">youtube.com</div>
+                        <div class="site-stats">85 min • 51 visits • Entertainment</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">energiaweb.energy</div>
+                        <div class="site-stats">38 min • 37 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">nay.sk</div>
+                        <div class="site-stats">31 min • 34 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">admin.websupport.sk</div>
+                        <div class="site-stats">27 min • 11 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">chatgpt.com</div>
+                        <div class="site-stats">26 min • 9 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">google.com</div>
+                        <div class="site-stats">16 min • 15 visits • Search</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #2E8B57;">
+                        <div class="site-domain">github.com</div>
+                        <div class="site-stats">15 min • 4 visits • Development</div>
+                    </div></div></div></div>
+            <div class="entry-item productivity-medium">
+                <div class="entry-date" onclick="toggleDetails('20250823')">Saturday, August 23, 2025</div>
+                <div class="entry-stats">
+                    68 sites • 
+                    14h 45m • 
+                    Productivity: 5.4/10
+                    <span style="font-size: 0.8em; color: #999;"> (click for details)</span>
+                </div>
+                <div class="entry-details" id="details_20250823">
+                    <div class="detail-stats">
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">68</div>
+                            <div class="detail-stat-label">Sites Visited</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">14h 45m</div>
+                            <div class="detail-stat-label">Total Time</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">5.4/10</div>
+                            <div class="detail-stat-label">Productivity</div>
+                        </div>
+                        <div class="detail-stat">
+                            <div class="detail-stat-value">9</div>
+                            <div class="detail-stat-label">Categories</div>
+                        </div>
+                    </div><h4>Top Categories:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Uncategorized</div>
+                        <div class="site-stats">504 minutes • 524 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">Professional</div>
+                        <div class="site-stats">194 minutes • 84 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">Entertainment</div>
+                        <div class="site-stats">90 minutes • 55 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">Search</div>
+                        <div class="site-stats">44 minutes • 20 visits</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">Communication</div>
+                        <div class="site-stats">30 minutes • 10 visits</div>
+                    </div></div><h4>Top Sites:</h4><div class='sites-grid'>
+                    <div class="site-entry" style="border-left-color: #20B2AA;">
+                        <div class="site-domain">linkedin.com</div>
+                        <div class="site-stats">194 min • 84 visits • Professional</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">energiaweb.energy</div>
+                        <div class="site-stats">185 min • 123 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #FF6347;">
+                        <div class="site-domain">youtube.com</div>
+                        <div class="site-stats">87 min • 48 visits • Entertainment</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">google.com</div>
+                        <div class="site-stats">44 min • 20 visits • Search</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">chatgpt.com</div>
+                        <div class="site-stats">44 min • 8 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">learning.edx.org</div>
+                        <div class="site-stats">32 min • 29 visits • Uncategorized</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #9370DB;">
+                        <div class="site-domain">mail.google.com</div>
+                        <div class="site-stats">30 min • 10 visits • Communication</div>
+                    </div>
+                    <div class="site-entry" style="border-left-color: #808080;">
+                        <div class="site-domain">ollama.com</div>
+                        <div class="site-stats">19 min • 8 visits • Uncategorized</div>
+                    </div></div></div></div>
+        </div>
+
+        <div class="section">
+            <h2>Today's Top Visited Sites</h2>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>localhost:8000</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    115 minutes • 207 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>127.0.0.1:8000</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    112 minutes • 114 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>perplexity.ai</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    91 minutes • 37 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #2E8B57;">
+                <div class="entry-date"><strong>github.com</strong> (Development)</div>
+                <div class="entry-stats">
+                    65 minutes • 60 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #9370DB;">
+                <div class="entry-date"><strong>mail.proton.me</strong> (Communication)</div>
+                <div class="entry-stats">
+                    60 minutes • 9 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>127.0.0.1:5001</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    25 minutes • 9 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #FF6347;">
+                <div class="entry-date"><strong>youtube.com</strong> (Entertainment)</div>
+                <div class="entry-stats">
+                    25 minutes • 29 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>192.168.1.1</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    16 minutes • 17 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #DDA0DD;">
+                <div class="entry-date"><strong>medium.com</strong> (Reading)</div>
+                <div class="entry-stats">
+                    5 minutes • 26 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>drive.proton.me</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    5 minutes • 10 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>root.cz</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    4 minutes • 6 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>apps.microsoft.com</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    4 minutes • 4 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #20B2AA;">
+                <div class="entry-date"><strong>linkedin.com</strong> (Professional)</div>
+                <div class="entry-stats">
+                    3 minutes • 5 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>dbgate.org</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    2 minutes • 1 visits
+                </div>
+            </div>
+
+            <div class="entry-item" style="border-left-color: #808080;">
+                <div class="entry-date"><strong>dbgate.io</strong> (Uncategorized)</div>
+                <div class="entry-stats">
+                    2 minutes • 2 visits
+                </div>
+            </div>
+
+        </div>
+
+        <div class="section">
+            <h2>Available Commands</h2>
+            <div class="commands">
+                <p><strong>Generate Journal:</strong><br>
+                <code>uv run python main.py generate</code></p>
+                
+                <p><strong>Start Scheduler:</strong><br>
+                <code>uv run python main.py schedule --start</code></p>
+                
+                <p><strong>Export Data:</strong><br>
+                <code>uv run python main.py export --format json</code></p>
+                
+                <p><strong>View Journal Files:</strong><br>
+                Check the <code>journals/</code> directory for markdown files</p>
+            </div>
+        </div>
+        
+        <div class="refresh-note">
+            Refresh this page after generating new journal entries to see updated data.
+        </div>
+    </div>
+</body>
+</html>

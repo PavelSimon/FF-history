@@ -1,0 +1,13 @@
+[project]
+name = "ff-history"
+version = "0.1.0"
+description = "Auto-Generate Daily Journal from Firefox Browser History with SQLite storage and Markdown export"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "schedule",
+    "streamlit",
+    "plotly",
+    "pandas",
+    "numpy",
+]

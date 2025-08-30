@@ -1,0 +1,29 @@
+{
+    "firefox": {
+        "profile_path": "auto",
+        "exclude_private": true,
+        "excluded_domains": ["localhost", "127.0.0.1"]
+    },
+    "journal": {
+        "output_directory": "./journals",
+        "template_path": "./templates/daily_template.md",
+        "include_statistics": true,
+        "minimum_visit_duration": 30
+    },
+    "database": {
+        "path": "./data/journal.db",
+        "backup_enabled": true,
+        "retention_days": 365
+    },
+    "scheduler": {
+        "enabled": true,
+        "time": "23:30",
+        "timezone": "local"
+    },
+    "dashboard": {
+        "host": "localhost",
+        "port": 8765,
+        "theme": "light",
+        "auto_refresh": 300
+    }
+}
