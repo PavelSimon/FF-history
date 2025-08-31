@@ -33,16 +33,19 @@ st.set_page_config(
 )
 
 @st.cache_data(ttl=300)  # Cache for 5 minutes
-def load_data(days: int = 30):
+def load_data(days: int = 30, start_date=None, end_date=None):
     """Load and cache journal data."""
     try:
         config = ConfigManager()
         db_manager = DatabaseManager(config.database_path)
         
-        # Get recent entries
-        end_date = date.today()
-        start_date = end_date - timedelta(days=days)
-        entries = db_manager.get_journal_entries_range(start_date, end_date)
+        # Get entries for specified date range or recent entries
+        if start_date and end_date:
+            entries = db_manager.get_journal_entries_range(start_date, end_date)
+        else:
+            end_date = date.today()
+            start_date = end_date - timedelta(days=days)
+            entries = db_manager.get_journal_entries_range(start_date, end_date)
         
         if not entries:
             return pd.DataFrame(), {}, {}, {}
@@ -76,6 +79,30 @@ def load_data(days: int = 30):
     except Exception as e:
         st.error(f"Error loading data: {e}")
         return pd.DataFrame(), {}, {}, {}
+
+@st.cache_data(ttl=300)
+def get_date_range():
+    """Get the available date range from the database."""
+    try:
+        config = ConfigManager()
+        db_manager = DatabaseManager(config.database_path)
+        
+        # Get journal entries for a large date range to find min/max dates
+        # Use a very wide range to catch all possible entries
+        start_range = date(2020, 1, 1)  # Far past date
+        end_range = date.today() + timedelta(days=30)  # Future date
+        
+        all_entries = db_manager.get_journal_entries_range(start_range, end_range)
+        if not all_entries:
+            return None, None
+            
+        dates = [datetime.strptime(entry['date'], '%Y-%m-%d').date() for entry in all_entries]
+        return min(dates), max(dates)
+        
+    except Exception as e:
+        if st.session_state.get('debug_mode', False):
+            st.sidebar.error(f"Debug: Error getting date range: {e}")
+        return None, None
 
 def create_productivity_chart(df: pd.DataFrame):
     """Create productivity trend chart."""
@@ -466,14 +493,71 @@ def main():
     
     # Sidebar
     st.sidebar.header("Settings")
-    days_to_show = st.sidebar.slider("Days to analyze", 1, 90, 14)
+    
+    # Debug options
+    with st.sidebar.expander("🔧 Debug Options"):
+        if st.button("🔄 Force Refresh All Data"):
+            st.cache_data.clear()
+            st.rerun()
+        
+        if st.button("🐛 Debug Mode"):
+            st.session_state.debug_mode = not st.session_state.get('debug_mode', False)
+            st.rerun()
+        
+        if st.session_state.get('debug_mode', False):
+            st.write("🐛 **Debug Mode Active**")
+    
+    # Get available date range
+    min_date, max_date = get_date_range()
+    
+    if min_date and max_date:
+        st.sidebar.info(f"📅 **Available data range:**\n\n{min_date} to {max_date}")
+        
+        # Date range selection option
+        date_option = st.sidebar.radio(
+            "Select time period:",
+            ["Recent days", "Custom date range"],
+            index=0
+        )
+        
+        if date_option == "Recent days":
+            days_to_show = st.sidebar.slider("Days to analyze", 1, 90, 14)
+            df, today_stats, hourly_stats, today_sites = load_data(days_to_show)
+        else:
+            # Custom date range
+            col1, col2 = st.sidebar.columns(2)
+            
+            with col1:
+                start_date = st.date_input(
+                    "Start date",
+                    value=max_date - timedelta(days=14),
+                    min_value=min_date,
+                    max_value=max_date
+                )
+            
+            with col2:
+                end_date = st.date_input(
+                    "End date",
+                    value=max_date,
+                    min_value=min_date,
+                    max_value=max_date
+                )
+            
+            # Validate date range
+            if start_date > end_date:
+                st.sidebar.error("Start date must be before end date")
+                df, today_stats, hourly_stats, today_sites = pd.DataFrame(), {}, {}, {}
+            else:
+                df, today_stats, hourly_stats, today_sites = load_data(None, start_date, end_date)
+    else:
+        # Fallback to days slider if no date range available
+        st.sidebar.warning("No data available yet")
+        days_to_show = st.sidebar.slider("Days to analyze", 1, 90, 14)
+        df, today_stats, hourly_stats, today_sites = load_data(days_to_show)
     
     if st.sidebar.button("🔄 Refresh Data"):
         st.cache_data.clear()
         st.rerun()
-    
-    # Load data
-    df, today_stats, hourly_stats, today_sites = load_data(days_to_show)
     
     if df.empty:
         st.warning("No journal data found. Generate your first journal entry:")
