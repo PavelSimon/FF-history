@@ -36,21 +36,24 @@ class FirefoxParser:
             logger.warning(f"Firefox profile directory not found: {firefox_dir}")
             return None
         
-        # Find the default profile (usually ends with .default or .default-release)
-        for profile in firefox_dir.iterdir():
-            if profile.is_dir() and ("default" in profile.name.lower()):
-                places_file = profile / "places.sqlite"
-                if places_file.exists():
-                    logger.info(f"Found Firefox profile: {profile}")
-                    return str(profile)
-        
-        # If no default profile found, use the first available profile
+        # Find all profiles with places.sqlite and get their last modification times
+        valid_profiles = []
         for profile in firefox_dir.iterdir():
             if profile.is_dir():
                 places_file = profile / "places.sqlite"
                 if places_file.exists():
-                    logger.info(f"Using Firefox profile: {profile}")
-                    return str(profile)
+                    # Get the modification time of the places.sqlite file
+                    mod_time = places_file.stat().st_mtime
+                    valid_profiles.append((profile, mod_time))
+        
+        if not valid_profiles:
+            return None
+        
+        # Sort by modification time (most recent first) and use the most recent profile
+        valid_profiles.sort(key=lambda x: x[1], reverse=True)
+        most_recent_profile = valid_profiles[0][0]
+        logger.info(f"Using most recently used Firefox profile: {most_recent_profile}")
+        return str(most_recent_profile)
         
         return None
     

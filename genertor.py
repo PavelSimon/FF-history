@@ -10,8 +10,8 @@ import subprocess
 from datetime import datetime, timedelta
 
 # CHANGE THESE DATES AS NEEDED
-start_date = "2024-01-01"  # Format: YYYY-MM-DD
-end_date = "2024-12-31"    # Format: YYYY-MM-DD
+start_date = "2023-01-01"  # Format: YYYY-MM-DD
+end_date = "2025-08-31"    # Format: YYYY-MM-DD
 
 def generate_statistics():
     start = datetime.strptime(start_date, "%Y-%m-%d")
